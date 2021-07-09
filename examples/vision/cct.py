@@ -53,7 +53,6 @@ import numpy as np
 ## Hyperparameters and constants
 """
 
-positional_emb = True
 conv_layers = 2
 projection_dim = 128
 
@@ -113,7 +112,7 @@ class CCTTokenizer(layers.Layer):
         pooling_stride=2,
         num_conv_layers=conv_layers,
         num_output_channels=[64, 128],
-        positional_emb=positional_emb,
+        positional_emb=True,
         **kwargs,
     ):
         super(CCTTokenizer, self).__init__(**kwargs)
@@ -250,11 +249,11 @@ def create_cct_model(
     augmented = data_augmentation(inputs)
 
     # Encode patches.
-    cct_tokenizer = CCTTokenizer()
+    cct_tokenizer = CCTTokenizer(positional_emb=False)
     encoded_patches = cct_tokenizer(augmented)
 
     # Apply positional embedding.
-    if positional_emb:
+    if cct_tokenizer.positional_emb:
         pos_embed, seq_length = cct_tokenizer.positional_embedding(image_size)
         positions = tf.range(start=0, limit=seq_length, delta=1)
         position_embeddings = pos_embed(positions)
